@@ -13,16 +13,14 @@ function solution(arr) {
     return answer;
 }
 
-// console.log(solution([2,2, 3,3,5,2,2]));
 
 /* filter
 : 주어진 함수의 테스트를 통과하는 모든 요소를 모야 새로운 배열로 반환하는 메서드
 */
-//example
+//example : 3보다 큰 숫자만 필터링
 var filtered = [1,2,3,4,5].filter((value) => {
-    if (value >= 3) { return value;}
+    if (value >= 3) { return value; }
 })
-console.log(filtered)
 
 function solution2(arr) {
     return arr.filter((num, index) => num != arr[index + 1]);
