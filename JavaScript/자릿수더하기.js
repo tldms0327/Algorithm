@@ -10,7 +10,7 @@ function solution(n)
     return answer;
 }
 
-
+//others
 function solution2(n)
 {
     var a = (n + '').split('');
@@ -31,3 +31,9 @@ function solution3(n) {
     });
     return sum;
 }
+
+function solution4(n,a=0,b=0) {
+    return String(n).length==a?b:solution4(n,a+1,b+=String(n)[a]*1);
+}
+// ===는 자료형까지 모두 같을 때, ==는 자료형 상관없이 들어있는 내용이 같을 때!
+// string에 1을 곱하면 int로 형변환
