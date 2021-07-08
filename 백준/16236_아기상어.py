@@ -1,8 +1,11 @@
+from collections import deque
+import heapq as hq
+
+
 def solution(n, grid):
     size = 2
     answer = 0
     moving = True
-    moving_direction = [(1, 0), (0, 1), (-1, 0), (0, -1)]
     # find first position of the fish
     for i in range(n):
         for j in range(n):
@@ -10,47 +13,49 @@ def solution(n, grid):
                 x, y = i, j
                 grid[i][j] = 0
                 break
-    eat_count = 0
-    visiting = set()
-    for dir in moving_direction:
-        if 0 <= x + dir[0] < n and 0 <= y + dir[1] < n:
-            visiting.add((x + dir[0], y + dir[1], 1))
-    eatable_fish = []
+
+    q = deque()
+    q.append((x, y, 0))
+    dirs = [(-1, 0), (0, -1), (1, 0), (0, 1)]
+    min_dist = []  # (dist, x,y) 형태로 저장
+    visited = set()
+    fish_count = 0
 
     while moving:
-        visit_done = set()
-        visit_done.add((x, y))
-        while visiting:
-            x1, y1, dist = visiting.pop()
-            if grid[x1][y1] <= size:
-                for dir in moving_direction:
-                    x2 = x1 + dir[0]
-                    y2 = y1 + dir[1]
-                    if 0 <= x2 < n and 0 <= y2 < n and (x2, y2) not in visit_done:
-                        visiting.add((x2, y2, dist + 1))
-            if 0 < grid[x1][y1] < size:
-                eatable_fish.append([x1, y1, dist])
+        while q:
+            x, y, dist = q.popleft()
+            visited.add((x, y))
+            for dx, dy in dirs:
+                x1, y1 = x + dx, y + dy
+                if 0 <= x1 < n and 0 <= y1 < n and (x1, y1) not in visited:
+                    visited.add((x1, y1))
 
-            visit_done.add((x1, y1))
-
-        if not eatable_fish:
-            moving = False
-        else:
-            eat = sorted(eatable_fish, key=lambda k: (k[2], k[0], k[1]))[0]
-            answer += eat[2]
-            x, y = eat[0], eat[1]
+                    # 다음 칸으로 이동 가능
+                    if grid[x1][y1] in [0, size]:
+                        q.append((x1, y1, dist + 1))
+                        continue
+                    # 이동할 수 없는 경우
+                    elif grid[x1][y1] > size:
+                        continue
+                    else:
+                        # min_dist.append((dist+1, x1, y1))
+                        hq.heappush(min_dist, (dist + 1, x1, y1))  # 힙큐가 쪼오끔 더 빠름
+        if min_dist:
+            dist, x, y = min_dist[0]
+            # dist, x, y = sorted(min_dist, key=lambda k: (k[0], k[1], k[2]))[0]
+            answer += dist
+            fish_count += 1
             grid[x][y] = 0
-            visiting.clear()
-            for dir in moving_direction:
-                if 0 <= x + dir[0] < n and 0 <= y + dir[1] < n:
-                    visiting.add((x + dir[0], y + dir[1], 1))
 
-            eatable_fish = []
-            eat_count += 1
-
-            if eat_count == size:
+            if fish_count == size:
                 size += 1
-                eat_count = 0
+                fish_count = 0
+            q.clear()
+            q.append((x, y, 0))
+            min_dist = []  # (dist, x,y) 형태로 저장
+            visited = set()
+        else:
+            moving = False
 
     return answer
 
